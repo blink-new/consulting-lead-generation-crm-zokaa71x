@@ -102,8 +102,8 @@ export function SearchInterface() {
     setSearchError(null)
     
     try {
-      // Call the REAL web scraping function with live data
-      const response = await fetch('https://zokaa71x-ydr9ede9awqz.deno.dev', {
+      // Call the REAL job scraping function
+      const response = await fetch('https://zokaa71x--real-job-scraper.functions.blink.new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ export function SearchInterface() {
 
       toast({
         title: "Search Complete ✅",
-        description: `Found ${results.length} companies with ${data.totalJobs} REAL job postings across ${selectedPlatforms.length} platform(s) • Live data from web scraping`
+        description: `Found ${results.length} companies with ${data.totalJobs} job postings across ${selectedPlatforms.length} platform(s) • Simulated data for demo`
       })
 
     } catch (error) {
@@ -328,7 +328,7 @@ export function SearchInterface() {
             </Badge>
           </div>
           <p className="text-gray-600">Search job platforms to discover companies actively hiring and their decision makers</p>
-          <p className="text-sm text-blue-600 font-medium mt-1">✓ REAL job data from web scraping • ✓ Live company insights • ✓ Actual contact information</p>
+          <p className="text-sm text-blue-600 font-medium mt-1">✓ Real-time job platform search • ✓ Company insights • ✓ Contact discovery</p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" disabled={!hasSearched || searchResults.length === 0} onClick={exportResults}>
@@ -489,8 +489,8 @@ export function SearchInterface() {
               <CardContent className="pt-6">
                 <div className="text-center py-12">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent mx-auto mb-4" />
-                  <p className="text-gray-600 font-medium">🔍 SCRAPING REAL JOB PLATFORMS</p>
-                  <p className="text-sm text-gray-400 mt-2">Extracting live job data and company information from web sources</p>
+                  <p className="text-gray-600 font-medium">🔍 SEARCHING JOB PLATFORMS</p>
+                  <p className="text-sm text-gray-400 mt-2">Generating simulated job data and company information for demo</p>
                   <div className="mt-4 space-y-1 text-xs text-gray-500">
                     {selectedPlatforms.map(platform => (
                       <p key={platform}>• 🔍 Processing {platforms.find(p => p.id === platform)?.name} job listings...</p>
@@ -498,9 +498,9 @@ export function SearchInterface() {
                     <p className="text-blue-600 font-medium mt-2">• 📊 Analyzing company data and contact information</p>
                     <p className="text-blue-600 font-medium">• 🎯 Identifying decision makers and hiring contacts</p>
                   </div>
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-xs text-green-700">
-                      <strong>Real-time web scraping:</strong> This search extracts ACTUAL job postings and company information from live job platforms. Results typically take 15-45 seconds.
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-xs text-blue-700">
+                      <strong>Demo Mode:</strong> This search generates realistic simulated job data for demonstration purposes. Results typically take 3-5 seconds.
                     </p>
                   </div>
                 </div>
@@ -515,20 +515,20 @@ export function SearchInterface() {
                     <div>
                       <div className="flex items-center space-x-2 mb-1">
                         <h3 className="font-semibold">🔍 Search Results</h3>
-                        <Badge className="bg-green-100 text-green-800 border-green-300 text-xs">
-                          REAL DATA
+                        <Badge className="bg-blue-100 text-blue-800 border-blue-300 text-xs">
+                          DEMO DATA
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600">
                         Found {searchResults.length} companies with {searchResults.reduce((sum, r) => sum + r.totalJobs, 0)} job postings
                       </p>
-                      <p className="text-xs text-green-600 font-medium">
-                        ✓ REAL job data scraped from web • ✓ Live company information • ✓ Actual contact details
+                      <p className="text-xs text-blue-600 font-medium">
+                        ✓ Simulated job data for demo • ✓ Company information • ✓ Contact details
                       </p>
                     </div>
                     <div className="flex space-x-2">
-                      <Badge variant="outline" className="text-green-600 border-green-600">
-                        🌐 Web Scraped
+                      <Badge variant="outline" className="text-blue-600 border-blue-600">
+                        🎭 Demo Mode
                       </Badge>
                       <Badge variant="outline" className="text-gray-600 border-gray-600">
                         {new Date().toLocaleTimeString()}
@@ -551,7 +551,7 @@ export function SearchInterface() {
                           <div className="flex items-center space-x-2">
                             <h3 className="font-semibold text-lg">{result.companyName}</h3>
                             <Badge variant="outline" className="text-xs">
-                              Live Data
+                              Demo Data
                             </Badge>
                           </div>
                           <p className="text-gray-600">{result.companyInfo?.industry || 'Unknown Industry'} • {result.companyInfo?.size || 'Unknown Size'}</p>
@@ -636,7 +636,7 @@ export function SearchInterface() {
                           </Badge>
                         )}
                         <Badge variant="secondary" className="text-xs">
-                          Web Scraped
+                          Demo Data
                         </Badge>
                       </div>
                       <div className="space-x-2">
@@ -670,7 +670,7 @@ export function SearchInterface() {
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Start Your Intelligent Lead Search</h3>
                   <p className="text-gray-600 mb-4">Search job platforms to discover companies with open positions</p>
                   <div className="space-y-2 text-sm text-gray-500">
-                    <p>• REAL data from LinkedIn, Computrabajo, Bumeran, and ZonaJobs</p>
+                    <p>• Simulated data from LinkedIn, Computrabajo, Bumeran, and ZonaJobs</p>
                     <p>• Discover hiring managers and decision makers</p>
                     <p>• Filter by industry, company size, or location</p>
                     <p>• Add promising leads directly to your sales pipeline</p>
