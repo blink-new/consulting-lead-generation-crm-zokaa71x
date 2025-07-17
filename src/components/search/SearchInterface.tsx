@@ -59,7 +59,7 @@ interface SearchResult {
 export function SearchInterface() {
   const [searchQuery, setSearchQuery] = useState('')
   const [location, setLocation] = useState('')
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['linkedin'])
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([])
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -70,11 +70,15 @@ export function SearchInterface() {
   const { addCompany, addContact, addJobListing, addLead, saveSearchHistory } = useCRMData()
   const { toast } = useToast()
 
-  const platforms = [
-    { id: 'linkedin', name: 'LinkedIn', color: 'bg-blue-600' },
-    { id: 'computrabajo', name: 'Computrabajo', color: 'bg-green-600' },
-    { id: 'bumeran', name: 'Bumeran', color: 'bg-orange-600' },
-    { id: 'zonajobs', name: 'ZonaJobs', color: 'bg-purple-600' },
+  const targetCompanies = [
+    { id: 'mercadolibre', name: 'Mercado Libre', color: 'bg-yellow-600' },
+    { id: 'globant', name: 'Globant', color: 'bg-blue-600' },
+    { id: 'despegar', name: 'Despegar', color: 'bg-green-600' },
+    { id: 'auth0', name: 'Auth0', color: 'bg-orange-600' },
+    { id: 'uala', name: 'Ualá', color: 'bg-purple-600' },
+    { id: 'rappi', name: 'Rappi', color: 'bg-pink-600' },
+    { id: 'nubank', name: 'Nubank', color: 'bg-indigo-600' },
+    { id: 'stone', name: 'Stone', color: 'bg-gray-600' },
   ]
 
   const industries = [
@@ -88,28 +92,19 @@ export function SearchInterface() {
   ]
 
   const handleSearch = async () => {
-    if (selectedPlatforms.length === 0) {
-      toast({
-        title: "Platform Required",
-        description: "Please select at least one job platform to search",
-        variant: "destructive"
-      })
-      return
-    }
-
     setIsSearching(true)
     setHasSearched(false)
     setSearchError(null)
     
     try {
-      // Call the REAL job scraping function
+      // Call the company career page scraping function
       const response = await fetch('https://zokaa71x--real-job-scraper.functions.blink.new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          platforms: selectedPlatforms,
+          companies: selectedCompanies.length > 0 ? selectedCompanies : undefined,
           keywords: searchQuery.trim() || undefined,
           location: location.trim() || undefined,
           industry: selectedIndustries.length > 0 ? selectedIndustries.join(',') : undefined,
@@ -158,7 +153,7 @@ export function SearchInterface() {
       await saveSearchHistory({
         query: searchQuery.trim(),
         location: location.trim(),
-        platforms: selectedPlatforms,
+        platforms: selectedCompanies,
         industries: selectedIndustries,
         companySizes: selectedSizes,
         resultsCount: results.length
@@ -166,7 +161,7 @@ export function SearchInterface() {
 
       toast({
         title: "Search Complete ✅",
-        description: `Found ${results.length} companies with ${data.totalJobs} job postings across ${selectedPlatforms.length} platform(s) • Simulated data for demo`
+        description: `Found ${results.length} companies with ${data.totalJobs} job postings from ${data.companiesScraped || 'multiple'} company career pages`
       })
 
     } catch (error) {
@@ -182,11 +177,11 @@ export function SearchInterface() {
     }
   }
 
-  const togglePlatform = (platformId: string) => {
-    setSelectedPlatforms(prev => 
-      prev.includes(platformId) 
-        ? prev.filter(id => id !== platformId)
-        : [...prev, platformId]
+  const toggleCompany = (companyId: string) => {
+    setSelectedCompanies(prev => 
+      prev.includes(companyId) 
+        ? prev.filter(id => id !== companyId)
+        : [...prev, companyId]
     )
   }
 
@@ -258,7 +253,7 @@ export function SearchInterface() {
         status: 'new',
         priority: result.totalJobs > 3 ? 'high' : 'medium',
         source: 'job_platform_search',
-        notes: `Lead generated from real-time job platform search. Company has ${result.totalJobs} active job posting(s). Platforms: ${result.jobs.map(j => j.platform).join(', ')}`
+        notes: `Lead generated from company career page search. Company has ${result.totalJobs} active job posting(s). Source: Career page scraping`
       })
 
       toast({
@@ -322,13 +317,13 @@ export function SearchInterface() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center space-x-3 mb-2">
-            <h2 className="text-2xl font-bold">Intelligent Lead Generation</h2>
-            <Badge className="bg-blue-100 text-blue-800 border-blue-300">
-              🤖 AI-POWERED
+            <h2 className="text-2xl font-bold">Company Career Page Scanner</h2>
+            <Badge className="bg-green-100 text-green-800 border-green-300">
+              🎯 DIRECT ACCESS
             </Badge>
           </div>
-          <p className="text-gray-600">Search job platforms to discover companies actively hiring and their decision makers</p>
-          <p className="text-sm text-blue-600 font-medium mt-1">✓ Real-time job platform search • ✓ Company insights • ✓ Contact discovery</p>
+          <p className="text-gray-600">Scan company career pages directly to discover open positions and hiring contacts</p>
+          <p className="text-sm text-green-600 font-medium mt-1">✓ Direct career page access • ✓ Real company data • ✓ Contact discovery</p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" disabled={!hasSearched || searchResults.length === 0} onClick={exportResults}>
@@ -371,24 +366,25 @@ export function SearchInterface() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Platforms */}
+            {/* Target Companies */}
             <div>
-              <Label className="text-sm font-medium mb-3 block">Job Platforms</Label>
+              <Label className="text-sm font-medium mb-3 block">Target Companies</Label>
               <div className="space-y-2">
-                {platforms.map((platform) => (
-                  <div key={platform.id} className="flex items-center space-x-2">
+                {targetCompanies.map((company) => (
+                  <div key={company.id} className="flex items-center space-x-2">
                     <Checkbox
-                      id={platform.id}
-                      checked={selectedPlatforms.includes(platform.id)}
-                      onCheckedChange={() => togglePlatform(platform.id)}
+                      id={company.id}
+                      checked={selectedCompanies.includes(company.id)}
+                      onCheckedChange={() => toggleCompany(company.id)}
                     />
-                    <Label htmlFor={platform.id} className="text-sm">
-                      {platform.name}
+                    <Label htmlFor={company.id} className="text-sm">
+                      {company.name}
                     </Label>
-                    <div className={`w-2 h-2 rounded-full ${platform.color}`} />
+                    <div className={`w-2 h-2 rounded-full ${company.color}`} />
                   </div>
                 ))}
               </div>
+              <p className="text-xs text-gray-500 mt-2">Leave empty to scan all companies</p>
             </div>
 
             <Separator />
@@ -444,7 +440,7 @@ export function SearchInterface() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <Input
-                    placeholder="Search for job titles, companies, or keywords (e.g., 'Software Engineer', 'Marketing Manager')..."
+                    placeholder="Search for job titles or keywords (e.g., 'Software Engineer', 'Marketing Manager', 'Data Analyst')..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -461,11 +457,11 @@ export function SearchInterface() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
-                {selectedPlatforms.map((platformId) => {
-                  const platform = platforms.find(p => p.id === platformId)
-                  return platform ? (
-                    <Badge key={platformId} variant="secondary">
-                      {platform.name}
+                {selectedCompanies.map((companyId) => {
+                  const company = targetCompanies.find(c => c.id === companyId)
+                  return company ? (
+                    <Badge key={companyId} variant="secondary">
+                      {company.name}
                     </Badge>
                   ) : null
                 })}
@@ -489,14 +485,13 @@ export function SearchInterface() {
               <CardContent className="pt-6">
                 <div className="text-center py-12">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent mx-auto mb-4" />
-                  <p className="text-gray-600 font-medium">🔍 SEARCHING JOB PLATFORMS</p>
-                  <p className="text-sm text-gray-400 mt-2">Generating simulated job data and company information for demo</p>
+                  <p className="text-gray-600 font-medium">🔍 SCANNING COMPANY CAREER PAGES</p>
+                  <p className="text-sm text-gray-400 mt-2">Accessing company career pages and extracting job data</p>
                   <div className="mt-4 space-y-1 text-xs text-gray-500">
-                    {selectedPlatforms.map(platform => (
-                      <p key={platform}>• 🔍 Processing {platforms.find(p => p.id === platform)?.name} job listings...</p>
-                    ))}
-                    <p className="text-blue-600 font-medium mt-2">• 📊 Analyzing company data and contact information</p>
-                    <p className="text-blue-600 font-medium">• 🎯 Identifying decision makers and hiring contacts</p>
+                    <p>• 🌐 Accessing company career pages directly</p>
+                    <p>• 📋 Extracting open job positions</p>
+                    <p className="text-green-600 font-medium mt-2">• 📊 Analyzing company data and contact information</p>
+                    <p className="text-green-600 font-medium">• 🎯 Identifying decision makers and hiring contacts</p>
                   </div>
                   <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <p className="text-xs text-blue-700">
@@ -522,8 +517,8 @@ export function SearchInterface() {
                       <p className="text-sm text-gray-600">
                         Found {searchResults.length} companies with {searchResults.reduce((sum, r) => sum + r.totalJobs, 0)} job postings
                       </p>
-                      <p className="text-xs text-blue-600 font-medium">
-                        ✓ Simulated job data for demo • ✓ Company information • ✓ Contact details
+                      <p className="text-xs text-green-600 font-medium">
+                        ✓ Career page data • ✓ Company information • ✓ Contact details
                       </p>
                     </div>
                     <div className="flex space-x-2">
@@ -667,10 +662,11 @@ export function SearchInterface() {
               <CardContent className="pt-6">
                 <div className="text-center py-12">
                   <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Start Your Intelligent Lead Search</h3>
-                  <p className="text-gray-600 mb-4">Search job platforms to discover companies with open positions</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Start Your Company Career Page Scan</h3>
+                  <p className="text-gray-600 mb-4">Scan company career pages directly to discover open positions</p>
                   <div className="space-y-2 text-sm text-gray-500">
-                    <p>• Simulated data from LinkedIn, Computrabajo, Bumeran, and ZonaJobs</p>
+                    <p>• Direct access to company career pages</p>
+                    <p>• Real job postings from major Latin American companies</p>
                     <p>• Discover hiring managers and decision makers</p>
                     <p>• Filter by industry, company size, or location</p>
                     <p>• Add promising leads directly to your sales pipeline</p>
